@@ -25,8 +25,8 @@ public class Product {
     @NotBlank(message = "Description is required")
     private String description;
 
-    @Column(name = "img_url")
-    private String imgUrl;
+//    @Column(name = "img_url")
+//    private String imgUrl;
 
     public Product() {
     }
@@ -35,7 +35,7 @@ public class Product {
         this.productName = productName;
         this.price = price;
         this.description = description;
-        this.imgUrl = imgUrl;
+//        this.imgUrl = imgUrl;
     }
 
     // Getters and Setters
@@ -51,6 +51,6 @@ public class Product {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public String getImgUrl() { return imgUrl; }
-    public void setImgUrl(String imgUrl) { this.imgUrl = imgUrl; }
+//    public String getImgUrl() { return imgUrl; }
+//    public void setImgUrl(String imgUrl) { this.imgUrl = imgUrl; }
 }
