@@ -32,8 +32,11 @@ public class User {
     @NotBlank(message = "Password is required")
     private String password;
 
-    @Column(name = "user_type_id")
-    @NotBlank(message = "User type is required")
+    @ManyToOne
+    @JoinColumn(name = "user_type_id", nullable = false)
+    private UserType userType;
+
+    @Transient // This field is not persisted in the database
     private long userTypeId;
 
     public User() {
@@ -48,6 +51,7 @@ public class User {
         this.userTypeId = userTypeId;
     }
 
+    // Getters and setters for all fields
     public long getId() {
         return id;
     }
@@ -94,6 +98,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 
     public long getUserTypeId() {
