@@ -1,7 +1,7 @@
 package com.example.coffee_shop.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "user_type")
@@ -10,8 +10,8 @@ public class UserType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "role")
-    @NotNull(message = "User role is required")
+    @Column(name = "role", nullable = false)
+    @NotBlank(message = "User role is required")
     private String role;
 
     public UserType() {

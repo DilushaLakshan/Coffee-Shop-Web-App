@@ -2,10 +2,15 @@ package com.example.coffee_shop.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.Collections;
 
 @Entity
 @Table(name = "user")
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -14,7 +19,7 @@ public class User {
     @NotBlank(message = "Name is required")
     private String name;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true, nullable = false)
     @NotBlank(message = "Email is required")
     @Email(message = "Email is not valid")
     private String email;
@@ -24,7 +29,7 @@ public class User {
     private String address;
 
     @Column(name = "contact")
-    @NotNull(message = "Contact number is required")
+    @NotBlank(message = "Contact number is required")
     @Pattern(regexp = "^\\d{10}$", message = "Contact number must be exactly 10 digits")
     private String contact;
 
@@ -36,19 +41,16 @@ public class User {
     @JoinColumn(name = "user_type_id", nullable = false)
     private UserType userType;
 
-    @Transient // This field is not persisted in the database
-    private long userTypeId;
-
     public User() {
     }
 
-    public User(String name, String email, String address, String contact, String password, long userTypeId) {
+    public User(String name, String email, String address, String contact, String password, UserType userType) {
         this.name = name;
         this.email = email;
         this.address = address;
         this.contact = contact;
         this.password = password;
-        this.userTypeId = userTypeId;
+        this.userType = userType;
     }
 
     // Getters and setters for all fields
@@ -76,6 +78,11 @@ public class User {
         this.email = email;
     }
 
+    @Override
+    public String getUsername() {
+        return email; // Return email as the username
+    }
+
     public String getAddress() {
         return address;
     }
@@ -92,6 +99,7 @@ public class User {
         this.contact = contact;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
@@ -108,11 +116,28 @@ public class User {
         this.userType = userType;
     }
 
-    public long getUserTypeId() {
-        return userTypeId;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptyList();
     }
 
-    public void setUserTypeId(long userTypeId) {
-        this.userTypeId = userTypeId;
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
