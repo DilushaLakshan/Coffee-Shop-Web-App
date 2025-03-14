@@ -1,6 +1,8 @@
 package com.example.coffee_shop.controller;
 
+import com.example.coffee_shop.model.User;
 import com.example.coffee_shop.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -8,14 +10,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class AuthController {
 
+    @Autowired
     private final UserService userService;
+    @Autowired
     private final AuthenticationManager authenticationManager;
 
     public AuthController(UserService userService, AuthenticationManager authenticationManager) {
@@ -60,7 +65,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request, HttpSession session) {
         String email = request.get("email"); // Use email as the username
         String password = request.get("password");
 
@@ -75,7 +80,20 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(email, password) // Use email as the username
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return ResponseEntity.ok(Map.of("message", "Login successful"));
+
+            // Fetch the authenticated user from the database
+            User user = userService.findByUsername(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Store the user object in the session
+            session.setAttribute("user", user);
+
+            // Return userId and email in the response (for frontend storage)
+            return ResponseEntity.ok(Map.of(
+                    "message", "Login successful",
+                    "userId", String.valueOf(user.getId()), // Convert long to String
+                    "email", user.getEmail()
+            ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid email or password"));
         }
